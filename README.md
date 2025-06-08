@@ -29,7 +29,7 @@ ShopKaro is a modern e-commerce website built with HTML, CSS, and JavaScript. It
 
 ## 🚀 Live Demo
 
-Visit the live website: [ShopKaro](https://abdullah-creates.github.io/ShopKaro)
+Visit the live website: [ShopKaro](https://abdullah-creates.github.io/ShopKaro-Ecommerce-Website/)
 
 ## 💻 Technologies Used
 
@@ -46,51 +46,6 @@ The website is fully responsive and optimized for:
 - Tablet (768px to 1199px)
 - Mobile (320px to 767px)
 
-## 🛠️ Installation & Setup
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/abdullah-creates/ShopKaro.git
-   ```
-
-2. Navigate to the project directory:
-   ```bash
-   cd ShopKaro
-   ```
-
-3. Open `index.html` in your browser or use a local server:
-   ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx http-server
-   ```
-
-## 🔧 Configuration
-
-No special configuration is required. The website uses client-side storage (localStorage) for:
-- User authentication
-- Shopping cart data
-- Wishlist items
-- Recently viewed products
-
-## 📝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Author
-
-- [Abdullah Ahmed](https://github.com/abdullah-creates) - Full-stack developer passionate about building innovative and user-friendly web applications
-- 📫 Contact: joed72427@gmail.com
 
 ## 🙏 Acknowledgments
 
