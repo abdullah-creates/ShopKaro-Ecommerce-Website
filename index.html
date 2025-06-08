@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShopKaro - Your premier destination for online shopping in India. Find great deals on electronics, fashion, home goods, and more.">
+    <title>ShopKaro - Your Shopping Destination</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <!-- Canvas for Confetti Effect -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+        <div class="loading-spinner" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="loading-text">Loading ShopKaro...</div>
+    </div>
+
+    <!-- Trending Ticker -->
+    <div class="trending-ticker" role="marquee">
+        <div class="ticker-content">
+            <span>FREE Delivery Nationwide on Orders Over Rs. 1,500 | Summer Sale - Up to 70% OFF | New Users Get Extra 15% OFF | Limited Time Offer</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="logo">
+                    <h1><a href="#home">ShopKaro</a></h1>
+                </div>
+                
+                <nav class="nav" aria-label="Main navigation">
+                    <ul class="nav-list">
+                        <li><a href="#home" class="nav-link active" aria-current="page">Home</a></li>
+                        <li><a href="#products" class="nav-link">Products</a></li>
+                        <li><a href="#wishlist" class="nav-link">Wishlist</a></li>
+                        <li><a href="#about" class="nav-link">About</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="user-area">
+                        <span id="userGreeting" class="user-greeting hidden"></span>
+                        <button id="loginBtn" class="btn-login" aria-label="Login">Login</button>
+                        <button id="logoutBtn" class="btn-logout hidden" aria-label="Logout">Logout</button>
+                    </div>
+                    <div class="cart-icon" id="cartIcon" role="button" tabindex="0" aria-label="Shopping cart">
+                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                        <span class="cart-count" id="cartCount" aria-label="Items in cart">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Welcome to ShopKaro</h1>
+                    <p class="hero-subtitle">The Best of Pakistan at Your Fingertips!</p>
+                    <div class="hero-features">
+                        <div class="feature">
+                            <i class="fas fa-truck-fast"></i>
+                            <span>Fast Delivery</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure Payment</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-tag"></i>
+                            <span>Best Deals</span>
+                        </div>
+                    </div>
+                    <a href="#products" class="btn-primary hero-cta">
+                        Shop Now
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-bg"></div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="products-section">
+            <div class="container">
+                <h2 class="section-title">Our Premium Collection</h2>
+                
+                <!-- Category Filter -->
+                <div class="category-filter" role="group" aria-label="Product category filters">
+                    <button class="filter-btn active" data-category="all" aria-pressed="true">All Products</button>
+                    <button class="filter-btn" data-category="electronics" aria-pressed="false">Electronics</button>
+                    <button class="filter-btn" data-category="fashion" aria-pressed="false">Fashion</button>
+                    <button class="filter-btn" data-category="home" aria-pressed="false">Home & Garden</button>
+                    <button class="filter-btn" data-category="accessories" aria-pressed="false">Accessories</button>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="productsGrid" role="grid" aria-label="Product grid">
+                    <!-- Products will be dynamically loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Recently Viewed Section -->
+        <section id="recentlyViewed" class="recently-viewed hidden">
+            <div class="container">
+                <h2 class="section-title">Recently Viewed</h2>
+                <div class="products-grid" id="recentlyViewedGrid">
+                    <!-- Recently viewed products will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Wishlist Section -->
+        <section id="wishlist" class="wishlist-section hidden">
+            <div class="container">
+                <h2 class="section-title">Your Wishlist</h2>
+                <div class="products-grid" id="wishlistGrid">
+                    <!-- Wishlist products will be loaded here -->
+                </div>
+                <div id="emptyWishlist" class="empty-state">
+                    <i class="fas fa-heart"></i>
+                    <h3>Your wishlist is empty</h3>
+                    <p>Save items you love to view them later</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about-section hidden">
+            <div class="container">
+                <h2 class="section-title">About ShopKaro</h2>
+                <div class="about-content">
+                    <p>ShopKaro is your premier destination for quality products and exclusive shopping experiences. We curate the finest selection of premium items across multiple categories.</p>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-shipping-fast"></i>
+                            <h3>Fast Shipping</h3>
+                            <p>Free express delivery on all orders</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Secure Payment</h3>
+                            <p>100% secure checkout process</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-medal"></i>
+                            <h3>Premium Quality</h3>
+                            <p>Only the finest products</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-headset"></i>
+                            <h3>24/7 Support</h3>
+                            <p>Customer service always available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#wishlist">Wishlist</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Categories</h3>
+                    <ul class="footer-links">
+                        <li><a href="#products" data-category="electronics">Electronics</a></li>
+                        <li><a href="#products" data-category="fashion">Fashion</a></li>
+                        <li><a href="#products" data-category="home">Home & Garden</a></li>
+                        <li><a href="#products" data-category="accessories">Accessories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> 03352651104</li>
+                        <li><i class="fas fa-envelope"></i> support@shopkaro.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Karachi, Pakistan</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get special offers and updates</p>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ShopKaro. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal" role="dialog" aria-labelledby="authTitle" aria-hidden="true">
+        <div class="modal-content">
+            <button class="close" aria-label="Close">&times;</button>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h2 id="authTitle">Welcome Back</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                    <p class="auth-switch">Don't have an account? <button type="button" id="showSignup" class="text-button">Sign up</button></p>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form hidden">
+                <h2>Create Account</h2>
+                <form id="signupFormElement">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn-primary">Sign Up</button>
+                    <p class="auth-switch">Already have an account? <button type="button" id="showLogin" class="text-button">Login</button></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div id="quickViewModal" class="modal">
+        <div class="modal-content quick-view-content">
+            <span class="close">&times;</span>
+            <div id="quickViewContainer">
+                <!-- Quick view content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-content">
+            <span class="close">&times;</span>
+            <h2>Your Shopping Cart</h2>
+            <div id="cartItems">
+                <!-- Cart items will be loaded here -->
+            </div>
+            <div id="emptyCart" class="empty-state">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Your cart is empty</h3>
+                <p>Add items to begin shopping</p>
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cartTotal">₹0.00</span>
+                </div>
+                <button id="checkoutBtn" class="btn-primary checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Form Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form class="checkout-form" id="checkoutForm">
+                <h2>Checkout</h2>
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Shipping Address</label>
+                    <textarea id="address" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" required>
+                </div>
+                <div class="form-group">
+                    <label for="pincode">PIN Code</label>
+                    <input type="text" id="pincode" required>
+                </div>
+                <button type="submit" class="btn-primary">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" id="successMessage" role="alert" aria-hidden="true">
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
+        <span id="successText">Operation completed successfully!</span>
+    </div>
+    <div class="error-message" id="errorMessage" role="alert" aria-hidden="true">
+        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+        <span id="errorText">An error occurred. Please try again.</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="init.js" defer></script>
+    <script src="animations.js" defer></script>
+    <script src="auth.js" defer></script>
+    <script src="wishlist.js" defer></script>
+    <script src="cart.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
