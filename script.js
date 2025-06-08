@@ -68,7 +68,7 @@ class LuxeStore {
                 name: "Premium Wireless Headphones",
                 category: "electronics",
                 price: 89999,  // PKR 89,999
-                image: "https://pixabay.com/get/g317d93c88d6d2820d13e6552d94c1f92aacfbaa3bb39e0b35f5c07d3be008e5799307f6524ece86c5f5dac8a04b72ce3d0a5dacb4739d2afbfe3eb87a892478a_1280.jpg",
+                image: "https://cdn.pixabay.com/photo/2012/02/22/20/09/headphones-15600_1280.jpg",
                 description: "High-quality wireless headphones with premium sound and noise cancellation.",
                 stock: 15  // Current stock count
             },
