@@ -1,65 +1,134 @@
 // Shopping Cart module
 class Cart {
     constructor() {
+        console.log('Cart constructor called');
+        if (Cart.instance) {
+            console.log('Returning existing Cart instance');
+            return Cart.instance;
+        }
+        console.log('Creating new Cart instance');
+        Cart.instance = this;
+        
         this.items = [];
         this.total = 0;
-        
+        this.initialized = false;
+        this.eventListenersSet = false;
         this.init();
     }
 
     init() {
+        console.log('Cart init called, initialized:', this.initialized);
+        if (this.initialized) return;
         this.loadCart();
         this.setupEventListeners();
         this.updateCartDisplay();
+        this.initialized = true;
     }
 
     setupEventListeners() {
+        console.log('Setting up event listeners, already set:', this.eventListenersSet);
+        if (this.eventListenersSet) return;
+
+        // Remove any existing listeners to be safe
+        document.removeEventListener('click', this.handleCartClick);
+        document.removeEventListener('click', this.handleCartControls);
+        document.removeEventListener('click', this.handleCheckout);
+
         // Cart icon click
-        document.getElementById('cartIcon').addEventListener('click', () => {
-            this.showCartModal();
-        });
+        const cartIcon = document.getElementById('cartIcon');
+        if (cartIcon) {
+            cartIcon.removeEventListener('click', this.showCartModalBound);
+            this.showCartModalBound = () => this.showCartModal();
+            cartIcon.addEventListener('click', this.showCartModalBound);
+        }
 
-        // Add to cart buttons (event delegation)
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('btn-add-cart')) {
-                const productId = parseInt(e.target.dataset.productId);
-                this.addToCart(productId, e.target);
+        // Add to cart buttons (using a single delegated event listener)
+        this.handleCartClick = (e) => {
+            const addToCartBtn = e.target.closest('.btn-add-cart');
+            if (!addToCartBtn) return;
+            
+            console.log('Add to cart clicked for product:', addToCartBtn.dataset.productId);
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = parseInt(addToCartBtn.dataset.productId);
+            if (!isNaN(productId)) {
+                // Check if we've already processed this click
+                if (addToCartBtn.dataset.processing === 'true') {
+                    console.log('Already processing click, ignoring');
+                    return;
+                }
+                
+                // Set processing flag
+                addToCartBtn.dataset.processing = 'true';
+                
+                // Add to cart
+                this.addToCart(productId, addToCartBtn);
+                
+                // Remove processing flag after a short delay
+                setTimeout(() => {
+                    delete addToCartBtn.dataset.processing;
+                }, 500);
             }
-        });
+        };
 
-        // Cart item controls (event delegation)
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('quantity-btn')) {
-                const productId = parseInt(e.target.dataset.productId);
-                const action = e.target.dataset.action;
-                this.updateQuantity(productId, action);
+        // Cart item controls
+        this.handleCartControls = (e) => {
+            const target = e.target;
+            
+            if (target.classList.contains('quantity-btn')) {
+                const productId = parseInt(target.dataset.productId);
+                const action = target.dataset.action;
+                if (!isNaN(productId)) {
+                    this.updateQuantity(productId, action);
+                }
+                return;
             }
             
-            if (e.target.classList.contains('remove-item')) {
-                const productId = parseInt(e.target.dataset.productId);
-                this.removeFromCart(productId);
+            const removeButton = target.closest('.remove-item');
+            if (removeButton) {
+                const productId = parseInt(removeButton.dataset.productId);
+                if (!isNaN(productId)) {
+                    this.removeFromCart(productId);
+                }
             }
-        });
+        };
 
         // Checkout button
-        document.addEventListener('click', (e) => {
+        this.handleCheckout = (e) => {
             if (e.target.id === 'checkoutBtn') {
                 this.checkout();
             }
+        };
+
+        // Add event listeners
+        document.addEventListener('click', this.handleCartClick);
+        document.addEventListener('click', this.handleCartControls);
+        document.addEventListener('click', this.handleCheckout);
+
+        // Close modal buttons
+        const closeButtons = document.querySelectorAll('.modal .close');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal');
+                if (modal) modal.classList.remove('show');
+            });
         });
+
+        this.eventListenersSet = true;
+        console.log('Event listeners setup complete');
     }
 
     addToCart(productId, buttonElement) {
+        console.log('Adding to cart:', productId);
         const product = window.luxeStore.getProduct(productId);
         if (!product) {
             this.showMessage('Product not found.', 'error');
             return;
         }
 
-        const existingItem = this.items.find(item => 
-            item.id === productId || 
-            item.name.toLowerCase() === product.name.toLowerCase()
-        );
+        const existingItem = this.items.find(item => item.id === productId);
         
         if (existingItem) {
             if (existingItem.quantity < product.stock) {
@@ -201,20 +270,19 @@ class Cart {
 
     renderCartItems() {
         const cartItems = document.getElementById('cartItems');
-        const cartSummary = document.getElementById('cartSummary');
         const emptyCart = document.getElementById('emptyCart');
+        const cartTotal = document.getElementById('cartTotal');
 
-        if (!cartItems || !cartSummary || !emptyCart) return;
+        if (!cartItems || !emptyCart) return;
 
         if (this.items.length === 0) {
             cartItems.style.display = 'none';
-            cartSummary.style.display = 'none';
             emptyCart.style.display = 'block';
+            if (cartTotal) cartTotal.textContent = 'Rs.0.00';
             return;
         }
 
         cartItems.style.display = 'block';
-        cartSummary.style.display = 'block';
         emptyCart.style.display = 'none';
 
         const formattedPrice = (price) => {
@@ -246,15 +314,7 @@ class Cart {
         `).join('');
 
         const total = this.calculateTotal();
-        cartSummary.innerHTML = `
-            <div class="cart-total">
-                <span>Total:</span>
-                <span>${formattedPrice(total)}</span>
-            </div>
-            <button id="checkoutBtn" class="btn-primary checkout-btn">
-                Proceed to Checkout
-            </button>
-        `;
+        if (cartTotal) cartTotal.textContent = formattedPrice(total);
     }
 
     showCartModal() {
@@ -271,26 +331,55 @@ class Cart {
 
         // Show checkout modal
         const checkoutModal = document.getElementById('checkoutModal');
-        checkoutModal.classList.add('show');
+        const checkoutForm = document.getElementById('checkoutForm');
+        
+        if (!checkoutModal || !checkoutForm) {
+            console.error('Checkout modal or form not found');
+            return;
+        }
 
-        // Handle form submission
-        const shippingForm = document.getElementById('shippingForm');
-        shippingForm.onsubmit = (e) => {
+        // Remove any existing event listeners
+        const oldForm = checkoutForm.cloneNode(true);
+        checkoutForm.parentNode.replaceChild(oldForm, checkoutForm);
+
+        // Add event listener for form submission
+        oldForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             // Get form data
-            const formData = new FormData(shippingForm);
-            const shippingDetails = Object.fromEntries(formData.entries());
+            const formData = new FormData(oldForm);
+            const shippingDetails = {
+                fullName: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                city: formData.get('city'),
+                pincode: formData.get('pincode')
+            };
             
             // Process order
             this.processOrder(shippingDetails);
-        };
+            
+            // Close cart modal if it's open
+            const cartModal = document.getElementById('cartModal');
+            if (cartModal) {
+                cartModal.classList.remove('show');
+            }
+            
+            // Close checkout modal
+            checkoutModal.classList.remove('show');
+        });
+
+        // Show the modal
+        checkoutModal.classList.add('show');
 
         // Close modal when clicking on close button
         const closeBtn = checkoutModal.querySelector('.close');
-        closeBtn.onclick = () => {
-            checkoutModal.classList.remove('show');
-        };
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                checkoutModal.classList.remove('show');
+            };
+        }
 
         // Close modal when clicking outside
         window.onclick = (e) => {
@@ -301,31 +390,40 @@ class Cart {
     }
 
     processOrder(shippingDetails) {
-        // Here you would typically send the order to a backend server
-        // For now, we'll just show a success message and clear the cart
-        
-        const orderDetails = {
-            items: this.items,
-            total: this.calculateTotal(),
-            shipping: shippingDetails,
-            orderId: 'ORD' + Date.now(),
-            orderDate: new Date().toISOString()
-        };
+        try {
+            // Here you would typically send the order to a backend server
+            const orderDetails = {
+                items: this.items,
+                total: this.calculateTotal(),
+                shipping: shippingDetails,
+                orderId: 'ORD' + Date.now(),
+                orderDate: new Date().toISOString()
+            };
 
-        console.log('Order processed:', orderDetails);
+            console.log('Processing order:', orderDetails);
 
-        // Show success message
-        this.showMessage('Order placed successfully! Order ID: ' + orderDetails.orderId, 'success');
+            // Clear cart first
+            this.clearCart();
 
-        // Clear cart
-        this.clearCart();
+            // Show success message
+            this.showMessage(`Order placed successfully! Order ID: ${orderDetails.orderId}`, 'success');
 
-        // Close checkout modal
-        const checkoutModal = document.getElementById('checkoutModal');
-        checkoutModal.classList.remove('show');
+            // Reset form
+            const checkoutForm = document.getElementById('checkoutForm');
+            if (checkoutForm) {
+                checkoutForm.reset();
+            }
 
-        // Reset form
-        document.getElementById('shippingForm').reset();
+            // Save empty cart state
+            this.saveCart();
+            this.saveUserCart();
+
+            return true;
+        } catch (error) {
+            console.error('Error processing order:', error);
+            this.showMessage('Failed to process order. Please try again.', 'error');
+            return false;
+        }
     }
 
     loadCart() {
@@ -364,7 +462,14 @@ class Cart {
     clearCart() {
         this.items = [];
         this.saveCart();
+        this.saveUserCart();
         this.updateCartDisplay();
+        
+        // Update cart count
+        const cartCount = document.getElementById('cartCount');
+        if (cartCount) {
+            cartCount.textContent = '0';
+        }
     }
 
     showMessage(message, type = 'success') {
@@ -374,9 +479,27 @@ class Cart {
     }
 }
 
-// Initialize and export
+// Initialize cart instance
+let cartInstance = null;
 document.addEventListener('DOMContentLoaded', () => {
-    window.cartManager = new Cart();
+    console.log('DOMContentLoaded - initializing cart');
+    if (!cartInstance) {
+        cartInstance = new Cart();
+        window.cartManager = cartInstance;
+    }
 });
 
-window.Cart = Cart;
+// Cleanup on page unload
+window.addEventListener('unload', () => {
+    if (cartInstance) {
+        console.log('Cleaning up cart instance');
+        document.removeEventListener('click', cartInstance.handleCartClick);
+        document.removeEventListener('click', cartInstance.handleCartControls);
+        document.removeEventListener('click', cartInstance.handleCheckout);
+    }
+});
+
+// Export only if needed for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Cart;
+}

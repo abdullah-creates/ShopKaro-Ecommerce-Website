@@ -461,11 +461,6 @@ class LuxeStore {
             });
         }
 
-        const addToCartBtn = card.querySelector('.btn-add-cart');
-        if (addToCartBtn && window.cartManager) {
-            addToCartBtn.addEventListener('click', () => window.cartManager.addToCart(product.id));
-        }
-
         return card;
     }
 
@@ -520,12 +515,6 @@ class LuxeStore {
                 wishlistBtn.classList.add('active');
             }
             wishlistBtn.addEventListener('click', () => window.wishlistManager.toggleWishlist(product.id, wishlistBtn));
-        }
-
-        // Setup add to cart button
-        const addToCartBtn = quickViewModal.querySelector('.btn-add-cart');
-        if (addToCartBtn && window.cartManager) {
-            addToCartBtn.addEventListener('click', () => window.cartManager.addToCart(product.id));
         }
 
         // Close on outside click
